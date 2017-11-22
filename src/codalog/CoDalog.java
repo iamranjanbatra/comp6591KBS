@@ -18,7 +18,8 @@ import codalog.output.OutputUtils;
 
 
 public class CoDalog {
-
+	
+	public static BufferedReader buffer;
 	public static void main(String... args) {
     	Log log;
         if(args.length > 0) {
@@ -44,48 +45,49 @@ public class CoDalog {
             int operation = Integer.parseInt(operationString);
             if(operation ==1 ){
             	System.out.println("Enter the name of the file");
+                  
             }
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
-            
-            List<String> history = new LinkedList<>();
             
             while(true) {
                 try {
-                    String line = buffer.readLine();
+                	buffer = new BufferedReader(new InputStreamReader(System.in));
+                    List<String> history = new LinkedList<>();
+                	String line = buffer.readLine();
+                    System.out.println("Checking");
                     if(line == null) {
-                        break; // EOF
+                        break;									 // EOF
                     }
-                    line = line.trim();
                     StringTokenizer tokenizer = new StringTokenizer(line);
-                    if(!tokenizer.hasMoreTokens())
+                    
+                    if(!tokenizer.hasMoreTokens()){
                     	continue;
-                    String commandType = tokenizer.nextToken().toLowerCase();
-                    int command = Integer.parseInt(commandType);
+                    }
+                    
                     // Intercept some special commands
                     
-                    if(command==5) {
+                    if(operation==5) {
                     	System.out.println("breaking ");
                         System.exit(0);
-                        } else if(command==3) {			// same as dump
+                        break;
+                        } else if(operation==3) {			// same as dump
                         System.out.println(jatalog);
 						history.add(line);
 						continue;
                     } else if (operation ==1){
-                    	if(command==1) {
-						if(!tokenizer.hasMoreTokens()) {
-							System.err.println("error: filename expected");
+                    	if(!tokenizer.hasMoreTokens()) {
+							System.err.println("error: Filename Not Expected");
 							continue;
 						}
-						
 						QueryInterface qo = new DefaultQueryOutput();
 						
-						try (Reader reader = new BufferedReader(new FileReader("R:/Workspace Latest/codalog/src/codalog/kbsfile.cdl"))) {
+						try (Reader reader = new BufferedReader(new FileReader("R:/Workspace Latest/codalog/src/kbsfile.cdl"))){
 							jatalog.executeAll(reader, qo);
 						}
-                        System.out.println("File Loaded Successfully"); // exception not thrown
+						
+                        System.out.println("Operation Successfully"); // exception not thrown
 						history.add(line);
 						continue;
-					} }else if(command==2) {
+					} else if(operation==2) {						// Operation For Parsing 
                         jatalog.validate();
                         System.out.println("OK."); // exception not thrown
                         history.add(line);
@@ -109,6 +111,8 @@ public class CoDalog {
                 }
             }
         }
-
-    }
+	}
 }
+
+    
+
