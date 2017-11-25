@@ -76,16 +76,15 @@ public class NewCodalog {
             	 System.out.println("File Successfully Parsed");
             }
             else if(operation==3){
-            	
+                System.out.println(jatalog);
             }
-            else if(operation ==6){
-            	System.out.println("Next Command");
-            	
-            	
-            	continue;
+            else if(operation==4){
+            	//For Query 
             }
+            else if(operation ==5){
+            	System.out.println("CoDalog Program Successfully Closed");
+            	break; }
             else{
-            	System.out.println("Hie");
             	continue;
             }
             
