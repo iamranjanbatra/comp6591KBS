@@ -75,6 +75,9 @@ public class NewCodalog {
             	 jatalog.validate();
             	 System.out.println("File Successfully Parsed");
             }
+            else if(operation==3){
+            	
+            }
             else if(operation ==6){
             	System.out.println("Next Command");
             	
