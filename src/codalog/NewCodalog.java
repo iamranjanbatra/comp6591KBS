@@ -5,11 +5,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import codalog.interfaces.QueryInterface;
-import codalog.output.DefaultQueryOutput;
+import codalog.output.*;
+
 import codalog.CodalogException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Scanner;
 public class NewCodalog {
 	
@@ -21,7 +25,7 @@ public class NewCodalog {
 				
 				return buffer;
 			}
-			public static void main(String... args) throws CodalogException{
+			public static void main(String... args) throws CodalogException, IOException{
 	    	Log log;
 	        if(args.length > 0) {
 	            // Read input from a file...
@@ -38,8 +42,8 @@ public class NewCodalog {
 	            }
 	        } else {
 	            // Get input from command line
-	            DatalogInterpreter jatalog = new DatalogInterpreter();
-	            System.out.println("Neew CoDalog: Concordia Datalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
+	            DatalogInterpreter codalog = new DatalogInterpreter();
+	            System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
 	        
 
             Scanner operationType = new Scanner(System.in);
@@ -61,9 +65,9 @@ public class NewCodalog {
 				File dataFile = new File("src/" + strDataFile);
 				
 				try (Reader reader = new BufferedReader(new FileReader(dataFile))){
-					jatalog.executeAll(reader, qo);
-					System.out.println("Operation Successfully"); 
-				
+					codalog.executeAll(reader, qo);
+					System.out.println("Operation Successfull"); 
+		            System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
 				}
 				catch(IOException io){
 					System.out.println("File Not Found");
@@ -72,14 +76,39 @@ public class NewCodalog {
 	        
             else if(operation == 2){
             	
-            	 jatalog.validate();
+            	 codalog.validate();
             	 System.out.println("File Successfully Parsed");
+		         System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
+
             }
             else if(operation==3){
-                System.out.println(jatalog);
+                System.out.println(codalog);
+	            System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
+
             }
             else if(operation==4){
-            	//For Query 
+            	System.out.println("Please choose between naive or seminaive evualuation.");
+				Scanner sc = new Scanner(System.in);
+				String eval = sc.nextLine();
+				if(eval.equals("naive")){codalog.setIsNaive(true);}
+				else if(eval.equals("seminaive")){codalog.setIsNaive(false);}
+				else{codalog.setIsNaive(false);}
+				System.out.println("Please enter a query: ");
+				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+				String line = reader.readLine();
+				System.out.println("Query : " + line);
+				long start = System.currentTimeMillis();
+                Collection<Map<String, String>> executed = codalog.executeAll(line);
+                double runTime = (System.currentTimeMillis() - start)/1000.0;
+                
+				if (executed != null) 
+				{
+					String result = OutputUtils.answersToString(executed);
+					System.out.println("Result is : " + result);
+                    System.out.println(String.format("%.3fs Running time: ", runTime));
+				}        
+	            System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
+
             }
             else if(operation ==5){
             	System.out.println("CoDalog Program Successfully Closed");

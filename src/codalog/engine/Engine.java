@@ -131,13 +131,8 @@ public abstract  class Engine {
 	    return relevant;
 	}
 	
-    /* This basically constructs the dependency graph for semi-naive evaluation: In the returned map, the string
-    is a predicate in the rules' heads that maps to a collection of all the rules that have that predicate in
-    their body so that we can easily find the rules that are affected when new facts are deduced in different
-    iterations of buildDatabase().
-    For example if you have a rule p(X) :- q(X) then there will be a mapping from "q" to that rule
-    so that when new facts q(Z) are deduced, the rule will be run in the next iteration to deduce p(Z) */
-	protected static Map<String, Collection<Rules>> buildDependentRules(Collection<Rules> rules) {
+    /* Constructs the dependency graph for seminaive evaluation */
+	protected static Map<String, Collection<Rules>> buildDependentRulesSemiNaive(Collection<Rules> rules) {
 	    Map<String, Collection<Rules>> map = new HashMap<>();
 	    for(Rules rule : rules) {
 	        for(Expression goal : rule.getBody()) {
@@ -153,11 +148,22 @@ public abstract  class Engine {
 	    return map;
 	}
 	
-    /* Retrieves all the rules that are affected by a collection of facts.
-     * This is used as part of the semi-naive evaluation: When new facts are generated, we 
-     * take a look at which rules have those facts in their bodies and may cause new facts 
-     * to be derived during the next iteration. 
-     * The `dependents` parameter was built earlier in the buildDependentRules() method */
+    /* Constructs the dependency graph for naive evaluation */
+	protected static Map<String, Collection<Rules>> buildDependentRulesNaive(Collection<Rules> rules) {
+	    Map<String, Collection<Rules>> map = new HashMap<>();
+	    for(Rules rule : rules) {
+	        for(Expression goal : rule.getBody()) {
+	            Collection<Rules> dependants = map.get(goal.getPredicate());
+	            if(dependants == null) {
+	                dependants = new ArrayList<>();
+	                map.put(goal.getPredicate(), dependants);
+	            }
+	            dependants.add(rule);
+	        }
+	    }
+	    return map;
+	}
+	
     protected static Collection<Rules> getDependentRules(IndexedSet<Expression,String> facts, Map<String, Collection<Rules>> dependents) {
         Set<Rules> dependantRules = new HashSet<>();
         for(String predicate : facts.getIndexes()) {

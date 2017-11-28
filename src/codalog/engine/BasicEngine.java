@@ -16,7 +16,7 @@ import codalog.Rules;
 public class BasicEngine extends Engine {
 
 	@Override
-	public Collection<Map<String, String>> query(DatalogInterpreter jatalog, List<Expression> goals, Map<String, String> bindings) throws CodalogException {
+	public Collection<Map<String, String>> query(DatalogInterpreter codalog, List<Expression> goals, Map<String, String> bindings) throws CodalogException {
 		if (goals.isEmpty())
 			return Collections.emptyList();
 
@@ -24,18 +24,18 @@ public class BasicEngine extends Engine {
 		List<Expression> orderedGoals = Engine.reorderQuery(goals);
 
 		
-		Collection<String> predicates = getRelevantPredicates(jatalog, goals);			
-		Collection<Rules> rules = jatalog.getIdb().stream().filter(rule -> predicates.contains(rule.getHead().getPredicate())).collect(Collectors.toSet());
+		Collection<String> predicates = getRelevantPredicates(codalog, goals);			
+		Collection<Rules> rules = codalog.getIdb().stream().filter(rule -> predicates.contains(rule.getHead().getPredicate())).collect(Collectors.toSet());
 
 		// Build an IndexedSet<> with only the relevant facts for this particular query.			
-		IndexedSet<Expression, String> facts = new IndexedSet<>();
-		for(String predicate : predicates) {
-			facts.addAll(jatalog.getEdbProvider().getFacts(predicate));
-		}
+		//IndexedSet<Expression, String> facts = new IndexedSet<>();
+		//for(String predicate : predicates) {
+		//	facts.addAll(jatalog.getEdbProvider().getFacts(predicate));
+		//}
+		IndexedSet<Expression, String> facts = codalog.getEdbProvider().allFacts();
 
 		// Build the database. A Set ensures that the facts are unique
-		IndexedSet<Expression, String> resultSet = expandDatabase(facts, rules);
-
+		IndexedSet<Expression, String> resultSet = expandDatabase(facts, rules, codalog.getIsNaive());
 		// Now match the expanded database to the goals
 		return matchGoals(orderedGoals, resultSet, bindings);
 	}
@@ -43,11 +43,17 @@ public class BasicEngine extends Engine {
     /* The core of the bottom-up implementation:
      * It computes the stratification of the rules in the EDB and then expands each
      * strata in turn, returning a collection of newly derived facts. */
-    private IndexedSet<Expression,String> expandDatabase(IndexedSet<Expression,String> facts, Collection<Rules> allRules) throws CodalogException {
+    private IndexedSet<Expression,String> expandDatabase(IndexedSet<Expression,String> facts, Collection<Rules> allRules, boolean isNaive) throws CodalogException {
         List< Collection<Rules> > strata = computeStratification(allRules);
         for(int i = 0; i < strata.size(); i++) {
             Collection<Rules> rules = strata.get(i);
-            expandStrata(facts, rules);
+			if(isNaive){
+            	//System.out.println("Naive evaluation");
+            	expandStrataNaive(facts, rules);}
+            else{
+            	//System.out.println("SemiNaive evaluation");
+            	expandStrata(facts, rules);
+            	}
         }
         return facts;
     }
@@ -66,7 +72,7 @@ public class BasicEngine extends Engine {
 		
 		Collection<Rules> rules = strataRules;
 
-        Map<String, Collection<Rules>> dependentRules = buildDependentRules(strataRules);
+        Map<String, Collection<Rules>> dependentRules = buildDependentRulesSemiNaive(strataRules);
 
         while(true) {
             // Match each rule to the facts
@@ -82,6 +88,36 @@ public class BasicEngine extends Engine {
 
             // Determine which rules depend on the newly derived facts
             rules = getDependentRules(newFacts, dependentRules);
+
+            facts.addAll(newFacts);
+        }
+    }
+    
+    /* This implements the naive part of the evaluator.
+     * For all the rules derive a collection of new facts; Repeat until no new
+     * facts can be derived.
+     */
+    private Collection<Expression> expandStrataNaive(IndexedSet<Expression,String> facts, Collection<Rules> strataRules) {
+
+		if (strataRules == null || strataRules.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		Collection<Rules> rules = strataRules;
+
+        Map<String, Collection<Rules>> dependentRules = buildDependentRulesNaive(strataRules);
+
+        while(true) {
+            // Match each rule to the facts
+        	IndexedSet<Expression,String> newFacts = new IndexedSet<>();
+            for(Rules rule : rules) {
+                newFacts.addAll(matchRule(facts, rule));
+            }
+
+            // Repeat until there are no more facts added
+            if(newFacts.isEmpty()) {
+                return facts;
+            }
 
             facts.addAll(newFacts);
         }

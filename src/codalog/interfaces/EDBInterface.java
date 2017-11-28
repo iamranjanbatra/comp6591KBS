@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import codalog.EDB;
 import codalog.Expression;
+import codalog.engine.IndexedSet;
 import codalog.DatalogInterpreter;
 
 /**
@@ -24,7 +25,7 @@ public interface EDBInterface {
 	 * Retrieves a {@code Collection} of all the facts in the database.
 	 * @return All the facts in the EDB
 	 */
-	public Collection<Expression> allFacts();
+	public IndexedSet<Expression, String> allFacts();
 	
 	/**
 	 * Adds a fact to the EDB database.

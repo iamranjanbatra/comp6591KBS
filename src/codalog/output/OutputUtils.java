@@ -62,7 +62,7 @@ public class OutputUtils {
      */
     public static String answersToString(Collection<Map<String, String>> answers) {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder resultBuilder = new StringBuilder();
         // If `answers` is null, the line passed to `jatalog.query(line)` was a statement that didn't
         //      produce any results, like a fact or a rule, rather than a query.
         // If `answers` is empty, then it was a query that doesn't have any answers, so the output is "No."
@@ -72,20 +72,20 @@ public class OutputUtils {
         if(answers != null) {
             if(!answers.isEmpty()){
                 if(answers.iterator().next().isEmpty()) {
-                    sb.append("Yes.");
+                    resultBuilder.append("True");
                 } else {
                     Iterator<Map<String, String>> iter = answers.iterator();
                     while (iter.hasNext()) {
-                        sb.append(bindingsToString(iter.next()));
+                        resultBuilder.append(bindingsToString(iter.next()));
                         if (iter.hasNext()) {
-                            sb.append("\n");
+                            resultBuilder.append("\n");
                         }
                     }
                 }
             } else {
-                sb.append("No.");
+                resultBuilder.append("False");
             }
         }
-        return sb.toString();
+        return resultBuilder.toString();
     }
 }

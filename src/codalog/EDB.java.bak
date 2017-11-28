@@ -14,7 +14,7 @@ public class EDB implements EDBInterface {
 	}
 	
 	@Override
-	public IndexedSet<Expression, String> allFacts() {
+	public Collection<Expression> allFacts() {
 		return edb;
 	}
 

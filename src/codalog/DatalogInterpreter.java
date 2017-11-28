@@ -23,6 +23,7 @@ public class DatalogInterpreter {
     private Collection<Rules> idb;      // Rules
     
     private Engine engine = new BasicEngine();
+	private boolean isNaive = false;
     
     public DatalogInterpreter() {
         this.edbProvider = new EDB();
@@ -218,5 +219,13 @@ public class DatalogInterpreter {
 
 	public Collection<Rules> getIdb() {
 		return idb;
+	}
+	
+	public boolean getIsNaive() {
+		return isNaive;
+	}
+
+	public void setIsNaive(boolean naive) {
+		this.isNaive  = naive;
 	}
 }
