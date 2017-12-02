@@ -30,6 +30,9 @@ public class DatalogInterpreter {
         this.idb = new ArrayList<>();
     }
 
+    public void expand() throws CodalogException {
+        this.engine.expand(this);
+    }
      static boolean isVariable(String term) {
         return Character.isUpperCase(term.charAt(0));
     }
@@ -172,7 +175,9 @@ public class DatalogInterpreter {
     	
     	StringBuilder sb = new StringBuilder("% Facts:\n");
         for(Expression fact : edbProvider.allFacts()) {
-            sb.append(fact).append(".\n");
+        	if (fact.isNew()){sb.append("*").append(fact).append(".\n");}
+        	else {sb.append(fact).append(".\n");}
+            
         }
         sb.append("\n% Rules:\n");
         for(Rules rule : idb) {

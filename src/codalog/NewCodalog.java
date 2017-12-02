@@ -66,7 +66,14 @@ public class NewCodalog {
 				
 				try (Reader reader = new BufferedReader(new FileReader(dataFile))){
 					codalog.executeAll(reader, qo);
-					System.out.println("Operation Successfull"); 
+					System.out.println("Loading Operation Successfull");
+					System.out.println("Please choose between naive or seminaive evualuation.");
+					Scanner sc = new Scanner(System.in);
+					String eval = sc.nextLine();
+					if(eval.equals("naive")){codalog.setIsNaive(true);}
+					else if(eval.equals("seminaive")){codalog.setIsNaive(false);}
+					else{codalog.setIsNaive(false);}
+					codalog.expand();
 		            System.out.println("Codalog Engine\n Press \n 1:Load File \n 2:Parsing Evaluation \n 3:Display Rules and Facts\n 4:Query \n 5:Exit");
 				}
 				catch(IOException io){

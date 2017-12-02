@@ -237,4 +237,9 @@ public abstract  class Engine {
         }
         return answers;
     }
+
+	public void expand(DatalogInterpreter codalog) throws CodalogException {
+		// Expand the EDB
+		
+	}
 }

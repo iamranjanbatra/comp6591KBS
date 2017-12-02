@@ -11,6 +11,7 @@ public class Expression implements Indexable<String> {
 
     private String predicate;
     private List<String> terms;
+    private boolean isNew;
 
     protected boolean negated = false;
 
@@ -22,6 +23,7 @@ public class Expression implements Indexable<String> {
             this.predicate = "<>";
         }
         this.terms = terms;
+        this.setNew(false);
     }
 
    
@@ -361,5 +363,13 @@ public class Expression implements Indexable<String> {
         } else if(isNegated()) {
             throw new CodalogException("Fact " + this + " is negated");
         }
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+	
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 }

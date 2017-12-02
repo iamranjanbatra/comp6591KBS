@@ -14,6 +14,12 @@ import codalog.Rules;
 
 
 public class BasicEngine extends Engine {
+	
+	@Override
+	public void expand(DatalogInterpreter codalog) throws CodalogException
+	{
+	expandDatabase(codalog.getEdbProvider().allFacts(), codalog.getIdb(), codalog.getIsNaive());
+	}
 
 	@Override
 	public Collection<Map<String, String>> query(DatalogInterpreter codalog, List<Expression> goals, Map<String, String> bindings) throws CodalogException {
@@ -88,7 +94,10 @@ public class BasicEngine extends Engine {
 
             // Determine which rules depend on the newly derived facts
             rules = getDependentRules(newFacts, dependentRules);
-
+            for (Expression e : newFacts)
+            {
+            e.setNew(true);	
+            }	
             facts.addAll(newFacts);
         }
     }
@@ -118,7 +127,10 @@ public class BasicEngine extends Engine {
             if(newFacts.isEmpty()) {
                 return facts;
             }
-
+            for (Expression e : newFacts)
+            {
+            e.setNew(true);	
+            }
             facts.addAll(newFacts);
         }
     }
